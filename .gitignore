@@ -1,0 +1,150 @@
+# ---------------------------------------------------------------------------
+# .NET build outputs
+# ---------------------------------------------------------------------------
+bin/
+obj/
+out/
+publish/
+artifacts/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+build/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# Single-file publish drops next to the .exe — guard against accidental commits.
+*.exe
+*.dll
+*.pdb
+*.cache
+*.tlog
+*.lastbuildstate
+*.metaproj
+*.metaproj.tmp
+*.binlog
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Inno Setup compiler output — committed installer .exe is never the artifact;
+# the source of truth is the .iss script + build.ps1.
+installer/output/
+
+# ---------------------------------------------------------------------------
+# Visual Studio
+# ---------------------------------------------------------------------------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.userprefs
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.opendb
+*.opendb-shm
+*.opendb-wal
+*.dbmdl
+*.jfm
+*.svclog
+
+# Visual Studio code coverage
+*.coverage
+*.coveragexml
+TestResults/
+[Tt]est[Rr]esult*/
+nunit-*.xml
+[Cc]overage*.json
+[Cc]overage*.xml
+[Cc]overage*.info
+
+# ---------------------------------------------------------------------------
+# JetBrains Rider / ReSharper
+# ---------------------------------------------------------------------------
+.idea/
+*.DotSettings.user
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# ---------------------------------------------------------------------------
+# Visual Studio Code
+# ---------------------------------------------------------------------------
+.vscode/
+
+# ---------------------------------------------------------------------------
+# NuGet
+# ---------------------------------------------------------------------------
+packages/
+!packages/build/
+*.nupkg
+*.snupkg
+*.nuspec
+.nuget/
+
+# ---------------------------------------------------------------------------
+# Code signing / secrets — NEVER commit these
+# ---------------------------------------------------------------------------
+*.pfx
+*.snk
+*.p12
+*.cer
+*.crt
+*.pvk
+*.spc
+.env
+.env.*
+!.env.example
+secrets.json
+appsettings.*.local.json
+
+# ---------------------------------------------------------------------------
+# Windows / macOS / Linux file-system cruft
+# ---------------------------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ---------------------------------------------------------------------------
+# Editor / temp / backup files
+# ---------------------------------------------------------------------------
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.orig
+*.rej
+*~$*
+.history/
+
+# ---------------------------------------------------------------------------
+# IIS Express / Web (defensive — not used today, but standard for .NET)
+# ---------------------------------------------------------------------------
+.vs/SignalLock/v17/
+.vs/SignalLock/FileContentIndex/
+*.publishsettings
+PublishScripts/
+PublishProfiles/*.user
+
+# ---------------------------------------------------------------------------
+# Inno Setup auxiliary
+# ---------------------------------------------------------------------------
+installer/*.iss.bak
+installer/Output/
