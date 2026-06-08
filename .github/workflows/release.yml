@@ -1,0 +1,77 @@
+name: Release
+
+# Builds the Windows installer (build.ps1 → dotnet publish → Inno Setup) and
+# publishes the setup .exe as a GitHub Release asset. The binary is NEVER
+# committed to git — this workflow is the single source of distributable
+# Windows builds.
+#
+#   Cut a release:  git tag v0.1.0 && git push origin v0.1.0
+#   Dry run:        Actions tab → Release → "Run workflow" (uploads an artifact,
+#                   does not create a Release).
+#
+# The installer ships UNSIGNED today: users pass the SmartScreen
+# "More info → Run anyway" prompt (documented on the download landing page). To
+# sign, add an Authenticode signing step (signtool) on the published exe before
+# "Stage release asset", using a certificate stored in repo secrets.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed to create the Release and upload assets
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: ./installer/build.ps1 -Configuration Release -Runtime win-x64
+
+      - name: Stage release asset
+        id: asset
+        shell: pwsh
+        run: |
+          $src = Get-ChildItem installer/output/SignalLock-Setup-*-x64.exe | Select-Object -First 1
+          $dest = "installer/output/SignalLock-Setup-x64.exe" # stable name → /releases/latest/download/SignalLock-Setup-x64.exe
+          Copy-Item $src.FullName $dest -Force
+          $sha = (Get-FileHash -Algorithm SHA256 $dest).Hash.ToLower()
+          "path=$dest" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          @(
+            "### SignalLock for Windows"
+            ""
+            "| File | SHA-256 |"
+            "|---|---|"
+            "| ``SignalLock-Setup-x64.exe`` | ``$sha`` |"
+            ""
+            "Verify: ``Get-FileHash -Algorithm SHA256 .\Downloads\SignalLock-Setup-x64.exe``"
+          ) | Out-File -FilePath "$env:RUNNER_TEMP/notes.md" -Encoding utf8
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME `
+            "${{ steps.asset.outputs.path }}" `
+            --title "SignalLock $env:GITHUB_REF_NAME (Windows)" `
+            --notes-file "$env:RUNNER_TEMP/notes.md"
+
+      - name: Upload artifact (dry runs only)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: SignalLock-Setup
+          path: ${{ steps.asset.outputs.path }}
